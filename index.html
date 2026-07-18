@@ -396,7 +396,11 @@
     scale = scale || 1;
 
     // Badge enlarged to fill the top area (was 120mm/top 10mm)
-    var badgeStyle = 'width:' + mm(170, scale) + ';top:' + mm(8, scale) + ';left:50%;transform:translateX(-50%);';
+    // Nudge just the badge left - 1.5cm on A4, 1cm on 2x2 (a real physical
+    // offset on the printed output either way, not scaled down). Text/price
+    // positions are left exactly as they are.
+    var badgeNudgeMm = (scale >= 0.9) ? 15 : 10;
+    var badgeStyle = 'width:' + mm(170, scale) + ';top:' + mm(5, scale) + ';left:calc(50% - ' + badgeNudgeMm + 'mm);transform:translateX(-50%);';
     var descStyle = 'top:' + mm(95, scale) + ';left:0;width:100%;font-size:' + mm(9, scale) + ';';
     var leftPos = mm(19.6, scale);
     var priceWidth = mm(173.2, scale);
@@ -421,7 +425,7 @@
       var b2Rm = 'top:' + mm(207, scale) + ';left:' + leftPos + ';font-size:' + mm(11, scale) + ';';
       var b2Price = 'top:' + mm(219, scale) + ';left:' + leftPos + ';width:' + priceWidth + ';font-size:' + memberPriceFontSizeMm(data.normalPrice, scale, true) + ';';
 
-      var promoStyle = 'top:' + mm(268, scale) + ';left:0;width:100%;font-size:' + mm(5, scale) + ';';
+      var promoStyle = 'top:' + mm(280, scale) + ';left:0;width:100%;font-size:' + mm(7, scale) + ';';
 
       priceSection =
         '<div class="price-label" style="' + b1Label + '">' + escapeHtml(data.priceLabel || 'MEMBER PRICE') + '</div>' +
