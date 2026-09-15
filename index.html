@@ -509,11 +509,27 @@
   function buyLineFontSizeMm(text, scale){
     var len = (text || '').length;
     var basePt;
-    if(len <= 14) basePt = 62;
-    else if(len <= 18) basePt = 54;
-    else if(len <= 22) basePt = 46;
-    else if(len <= 26) basePt = 40;
-    else basePt = 34;
+    if(len <= 14) basePt = 70;
+    else if(len <= 18) basePt = 62;
+    else if(len <= 22) basePt = 54;
+    else if(len <= 26) basePt = 46;
+    else basePt = 40;
+    return (basePt * 0.3528 * scale).toFixed(1) + 'mm';
+  }
+
+  // Normal Price on the BMS card intentionally reads smaller than both the
+  // BUY line above it and B1F1's Normal Price - it's a supporting number,
+  // not the headline - so it gets its own (smaller) ladder rather than
+  // sharing memberPriceFontSizeMm's isNormal branch (changing that shared
+  // function would also shrink B1F1's Member-mode Normal Price, which
+  // wasn't asked for).
+  function bmsNormalPriceFontSizeMm(text, scale){
+    var len = (text || '').length;
+    var basePt;
+    if(len <= 4) basePt = 100;
+    else if(len === 5) basePt = 88;
+    else if(len === 6) basePt = 76;
+    else basePt = 66;
     return (basePt * 0.3528 * scale).toFixed(1) + 'mm';
   }
 
@@ -597,10 +613,11 @@
 
   // ================= Buy More, Save More! popcard =================
   // Layout: BMS banner badge -> item description -> (Member badge, only in
-  // Member Price mode) -> big "BUY X FOR RM X.XX" line -> Normal Price
-  // block -> Promotion Until date. Positions below are first-pass estimates
-  // (not yet confirmed against a physical test print) - nudge the mm values
-  // if spacing needs adjusting once you print a sample.
+  // Member Price mode, sitting left-aligned in the gap above the BUY line)
+  // -> big "BUY X FOR RM X.XX" line -> Normal Price block -> Promotion Until
+  // date. Positions below are first-pass estimates (not yet confirmed
+  // against a physical test print) - nudge the mm values if spacing needs
+  // adjusting once you print a sample.
   function buildBMSPopcardHtml(data, scale){
     scale = scale || 1;
 
@@ -608,14 +625,14 @@
     var descStyle = 'top:' + mm(80, scale) + ';left:0;width:100%;font-size:' + mm(9, scale) + ';';
 
     var buyText = 'BUY ' + data.qty + ' FOR RM ' + data.promoPrice;
-    var buyLineStyle = 'top:' + mm(118, scale) + ';left:0;width:100%;font-size:' + buyLineFontSizeMm(buyText, scale) + ';';
+    var buyLineStyle = 'top:' + mm(128, scale) + ';left:0;width:100%;font-size:' + buyLineFontSizeMm(buyText, scale) + ';';
 
-    // Member badge sits as a small corner ribbon (not stacked in the centred
-    // text flow) so it can never collide with the BUY line however long that
-    // text ends up being.
+    // Member badge sits left-aligned in the gap between the item description
+    // and the BUY line (not on top of either), so it can never collide with
+    // the BUY line however long that text ends up being.
     var memberBadgeHtml = '';
     if(data.priceType === 'member'){
-      var memberBadgeStyle = 'width:' + mm(34, scale) + ';top:' + mm(8, scale) + ';right:' + mm(10, scale) + ';';
+      var memberBadgeStyle = 'width:' + mm(36, scale) + ';top:' + mm(92, scale) + ';left:' + mm(15, scale) + ';';
       memberBadgeHtml = '<img class="badge-img" style="' + memberBadgeStyle + '" src="' + memberBadgeImgSrc + '" alt="Servay Member">';
     }
 
@@ -623,7 +640,7 @@
     var priceWidth = mm(173.2, scale);
     var normLabelStyle = 'top:' + mm(190, scale) + ';left:' + leftPos + ';font-size:' + mm(6, scale) + ';';
     var normRmStyle = 'top:' + mm(201, scale) + ';left:' + leftPos + ';font-size:' + mm(11, scale) + ';';
-    var normPriceStyle = 'top:' + mm(213, scale) + ';left:' + leftPos + ';width:' + priceWidth + ';font-size:' + memberPriceFontSizeMm(data.normalPrice, scale, true) + ';';
+    var normPriceStyle = 'top:' + mm(213, scale) + ';left:' + leftPos + ';width:' + priceWidth + ';font-size:' + bmsNormalPriceFontSizeMm(data.normalPrice, scale) + ';';
 
     var promoStyle = 'top:' + mm(275, scale) + ';left:0;width:100%;font-size:' + mm(7, scale) + ';';
 
